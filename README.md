@@ -1,3 +1,3 @@
-# progress_button
+# progressable_button
 
-A progress button using streams
+A progressable button using streams
