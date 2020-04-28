@@ -51,14 +51,14 @@ class ProgressableTextButton extends StatelessWidget {
       vertical: 10,
       horizontal: 20,
     ),
-    this.big,
+    bool big,
     this.margin,
     this.enabledColor,
     this.loadingChild,
     this.disabledColor,
     this.errorColor,
     this.shadow,
-  });
+  }) : this.big = big ?? true;
 
   @override
   Widget build(BuildContext context) {
