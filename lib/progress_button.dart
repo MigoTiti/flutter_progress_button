@@ -9,20 +9,32 @@ import 'package:vector_math/vector_math_64.dart' as Vectors;
 import 'package:vibrate/vibrate.dart';
 
 class ProgressTextButton extends StatelessWidget {
-  final VoidCallback onClick;
   final String text;
   final TextStyle textStyle;
+
+  final VoidCallback onClick;
+
   final Stream<bool> loadingStream;
   final Stream<bool> enabledStream;
   final Stream<Exception> errorStream;
+
   final double expandedSize;
   final bool big;
+
   final EdgeInsets margin;
   final EdgeInsets loadingMargin;
   final EdgeInsets padding;
-  final Color enabledColor;
-  final BorderRadius borderRadius;
+
+  final BorderRadius idleBorderRadius;
+  final BorderRadius loadingBorderRadius;
+
   final Widget loadingChild;
+
+  final Color enabledColor;
+  final Color disabledColor;
+  final Color errorColor;
+
+  final List<BoxShadow> shadow;
 
   ProgressTextButton({
     this.loadingStream,
@@ -33,15 +45,19 @@ class ProgressTextButton extends StatelessWidget {
     this.textStyle,
     this.expandedSize,
     this.loadingMargin,
-    this.borderRadius,
+    this.idleBorderRadius,
+    this.loadingBorderRadius,
     this.padding = const EdgeInsets.symmetric(
       vertical: 10,
       horizontal: 20,
     ),
-    this.big = true,
+    this.big,
     this.margin,
     this.enabledColor,
     this.loadingChild,
+    this.disabledColor,
+    this.errorColor,
+    this.shadow,
   });
 
   @override
@@ -54,7 +70,7 @@ class ProgressTextButton extends StatelessWidget {
       enabledStream: enabledStream,
       loadingStream: loadingStream,
       expandedSize: expandedSize,
-      idleBorderRadius: borderRadius,
+      idleBorderRadius: idleBorderRadius,
       loadingMargin: loadingMargin,
       margin: margin,
       big: big,
@@ -73,19 +89,30 @@ class ProgressTextButton extends StatelessWidget {
 }
 
 class ProgressButton extends StatefulWidget {
-  final VoidCallback onClick;
   final Widget enabledChild;
   final Widget loadingChild;
+
+  final VoidCallback onClick;
+
   final Stream<bool> loadingStream;
   final Stream<bool> enabledStream;
   final Stream<Exception> errorStream;
+
   final double expandedSize;
   final bool big;
+
   final EdgeInsets margin;
   final EdgeInsets loadingMargin;
   final EdgeInsets padding;
+
   final Color enabledColor;
+  final Color disabledColor;
+  final Color errorColor;
+
   final BorderRadius idleBorderRadius;
+  final BorderRadius loadingBorderRadius;
+
+  final List<BoxShadow> shadow;
 
   ProgressButton({
     this.loadingStream,
@@ -94,10 +121,14 @@ class ProgressButton extends StatefulWidget {
     this.onClick,
     this.expandedSize,
     @required this.enabledChild,
-    this.idleBorderRadius,
-    this.big = true,
-    this.enabledColor,
     this.loadingChild,
+    bool big,
+    List<BoxShadow> shadow,
+    Color enabledColor,
+    Color errorColor,
+    Color disabledColor,
+    BorderRadius idleBorderRadius,
+    BorderRadius loadingBorderRadius,
     EdgeInsets padding,
     EdgeInsets loadingMargin,
     EdgeInsets margin,
@@ -105,7 +136,19 @@ class ProgressButton extends StatefulWidget {
             padding ?? ProgressButtonDefaultConfiguration.idlePadding,
         this.loadingMargin =
             loadingMargin ?? ProgressButtonDefaultConfiguration.loadingMargin,
-        this.margin = margin ?? ProgressButtonDefaultConfiguration.idleMargin;
+        this.margin = margin ?? ProgressButtonDefaultConfiguration.idleMargin,
+        this.loadingBorderRadius = loadingBorderRadius ??
+            ProgressButtonDefaultConfiguration.loadingBorderRadius,
+        this.idleBorderRadius = idleBorderRadius ??
+            ProgressButtonDefaultConfiguration.idleBorderRadius,
+        this.enabledColor =
+            enabledColor ?? ProgressButtonDefaultConfiguration.enabledColor,
+        this.errorColor =
+            errorColor ?? ProgressButtonDefaultConfiguration.errorColor,
+        this.disabledColor =
+            disabledColor ?? ProgressButtonDefaultConfiguration.disabledColor,
+        this.shadow = shadow ?? ProgressButtonDefaultConfiguration.shadow,
+        this.big = big ?? true;
 
   @override
   _ProgressButtonState createState() => _ProgressButtonState();
@@ -189,11 +232,6 @@ class _ProgressButtonState extends State<ProgressButton>
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = _loading
-        ? BorderRadius.circular(100)
-        : widget.idleBorderRadius ??
-            ProgressButtonDefaultConfiguration.idleBorderRadius;
-
     return IgnorePointer(
       ignoring: _inErrorAnimation || !_enabled || _loading,
       child: Container(
@@ -210,15 +248,9 @@ class _ProgressButtonState extends State<ProgressButton>
             duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
             decoration: BoxDecoration(
-              color: _inErrorAnimation
-                  ? Theme.of(context).errorColor
-                  : _loading || !_enabled
-                      ? Theme.of(context).disabledColor
-                      : widget.enabledColor ??
-                          ProgressButtonDefaultConfiguration.enabledColor ??
-                          Theme.of(context).primaryColor,
-              borderRadius: borderRadius,
-              boxShadow: [ProgressButtonDefaultConfiguration.boxShadow],
+              color: _backgroundColor,
+              borderRadius: _borderRadius,
+              boxShadow: widget.shadow,
             ),
             child: Stack(
               children: <Widget>[
@@ -226,14 +258,7 @@ class _ProgressButtonState extends State<ProgressButton>
                   vsync: this,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.ease,
-                  child: _loading
-                      ? widget.loadingChild ??
-                          _buildDefaultLoadingWidget(context)
-                      : Container(
-                          padding: widget.padding,
-                          width: widget.expandedSize,
-                          child: widget.enabledChild,
-                        ),
+                  child: _child,
                 ),
                 Positioned(
                   right: 0,
@@ -244,7 +269,7 @@ class _ProgressButtonState extends State<ProgressButton>
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: widget.onClick,
-                      borderRadius: borderRadius,
+                      borderRadius: _borderRadius,
                     ),
                   ),
                 ),
@@ -256,7 +281,33 @@ class _ProgressButtonState extends State<ProgressButton>
     );
   }
 
-  Widget _buildDefaultLoadingWidget(BuildContext context) {
+  Widget get _child {
+    if (_loading) return widget.loadingChild ?? _buildDefaultLoadingWidget();
+
+    return Container(
+      padding: widget.padding,
+      width: widget.expandedSize,
+      child: widget.enabledChild,
+    );
+  }
+
+  BorderRadius get _borderRadius {
+    if (_loading) return widget.loadingBorderRadius;
+
+    return widget.idleBorderRadius;
+  }
+
+  Color get _backgroundColor {
+    if (_inErrorAnimation)
+      return widget.errorColor ?? Theme.of(context).errorColor;
+
+    if (_loading || !_enabled)
+      return widget.disabledColor ?? Theme.of(context).disabledColor;
+
+    return widget.enabledColor ?? Theme.of(context).primaryColor;
+  }
+
+  Widget _buildDefaultLoadingWidget() {
     return Container(
       padding: EdgeInsets.all(widget.big ? 12 : 8),
       child: SizedBox(
@@ -289,15 +340,19 @@ class ProgressButtonDefaultConfiguration {
 
   static EdgeInsets idlePadding = const EdgeInsets.symmetric(vertical: 10);
 
-  static BorderRadius idleBorderRadius =
-      const BorderRadius.all(Radius.circular(10));
+  static BorderRadius idleBorderRadius = BorderRadius.circular(10);
+  static BorderRadius loadingBorderRadius = BorderRadius.circular(100);
 
   static Color enabledColor;
+  static Color errorColor;
+  static Color disabledColor;
 
-  static BoxShadow boxShadow = BoxShadow(
-    color: Colors.grey.withOpacity(0.5),
-    blurRadius: 5.0,
-    spreadRadius: 0.25,
-    offset: Offset(0, 3),
-  );
+  static List<BoxShadow> shadow = [
+    BoxShadow(
+      color: Colors.grey.withOpacity(0.5),
+      blurRadius: 5.0,
+      spreadRadius: 0.25,
+      offset: Offset(0, 3),
+    ),
+  ];
 }
