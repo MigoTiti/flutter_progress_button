@@ -1,6 +1,6 @@
 name: progress_button
 description: A progress button using streams
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/MigoTiti/flutter_progress_button
 
 environment:
