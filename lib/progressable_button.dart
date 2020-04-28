@@ -1,4 +1,4 @@
-library progress_button;
+library progressable_button;
 
 import 'dart:async';
 import 'dart:math';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as Vectors;
 import 'package:vibrate/vibrate.dart';
 
-class ProgressTextButton extends StatelessWidget {
+class ProgressableTextButton extends StatelessWidget {
   final String text;
   final TextStyle textStyle;
 
@@ -36,7 +36,7 @@ class ProgressTextButton extends StatelessWidget {
 
   final List<BoxShadow> shadow;
 
-  ProgressTextButton({
+  ProgressableTextButton({
     this.loadingStream,
     this.enabledStream,
     this.errorStream,
@@ -62,7 +62,7 @@ class ProgressTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProgressButton(
+    return ProgressableButton(
       padding: padding,
       errorStream: errorStream,
       onClick: onClick,
@@ -88,7 +88,7 @@ class ProgressTextButton extends StatelessWidget {
   }
 }
 
-class ProgressButton extends StatefulWidget {
+class ProgressableButton extends StatefulWidget {
   final Widget enabledChild;
   final Widget loadingChild;
 
@@ -114,7 +114,7 @@ class ProgressButton extends StatefulWidget {
 
   final List<BoxShadow> shadow;
 
-  ProgressButton({
+  ProgressableButton({
     this.loadingStream,
     this.enabledStream,
     this.errorStream,
@@ -133,28 +133,28 @@ class ProgressButton extends StatefulWidget {
     EdgeInsets loadingMargin,
     EdgeInsets margin,
   })  : this.padding =
-            padding ?? ProgressButtonDefaultConfiguration.idlePadding,
+            padding ?? ProgressableButtonDefaultConfiguration.idlePadding,
         this.loadingMargin =
-            loadingMargin ?? ProgressButtonDefaultConfiguration.loadingMargin,
-        this.margin = margin ?? ProgressButtonDefaultConfiguration.idleMargin,
+            loadingMargin ?? ProgressableButtonDefaultConfiguration.loadingMargin,
+        this.margin = margin ?? ProgressableButtonDefaultConfiguration.idleMargin,
         this.loadingBorderRadius = loadingBorderRadius ??
-            ProgressButtonDefaultConfiguration.loadingBorderRadius,
+            ProgressableButtonDefaultConfiguration.loadingBorderRadius,
         this.idleBorderRadius = idleBorderRadius ??
-            ProgressButtonDefaultConfiguration.idleBorderRadius,
+            ProgressableButtonDefaultConfiguration.idleBorderRadius,
         this.enabledColor =
-            enabledColor ?? ProgressButtonDefaultConfiguration.enabledColor,
+            enabledColor ?? ProgressableButtonDefaultConfiguration.enabledColor,
         this.errorColor =
-            errorColor ?? ProgressButtonDefaultConfiguration.errorColor,
+            errorColor ?? ProgressableButtonDefaultConfiguration.errorColor,
         this.disabledColor =
-            disabledColor ?? ProgressButtonDefaultConfiguration.disabledColor,
-        this.shadow = shadow ?? ProgressButtonDefaultConfiguration.shadow,
+            disabledColor ?? ProgressableButtonDefaultConfiguration.disabledColor,
+        this.shadow = shadow ?? ProgressableButtonDefaultConfiguration.shadow,
         this.big = big ?? true;
 
   @override
-  _ProgressButtonState createState() => _ProgressButtonState();
+  _ProgressableButtonState createState() => _ProgressableButtonState();
 }
 
-class _ProgressButtonState extends State<ProgressButton>
+class _ProgressableButtonState extends State<ProgressableButton>
     with TickerProviderStateMixin {
   StreamSubscription _errorSubscription;
   StreamSubscription _loadingSubscription;
@@ -334,7 +334,7 @@ class _ProgressButtonState extends State<ProgressButton>
   }
 }
 
-class ProgressButtonDefaultConfiguration {
+class ProgressableButtonDefaultConfiguration {
   static EdgeInsets idleMargin = EdgeInsets.zero;
   static EdgeInsets loadingMargin = EdgeInsets.zero;
 
