@@ -34,6 +34,10 @@ class ProgressableTextButton extends StatelessWidget {
   final Color disabledColor;
   final Color errorColor;
 
+  final Gradient enabledGradient;
+  final Gradient disabledGradient;
+  final Gradient errorGradient;
+
   final List<BoxShadow> shadow;
 
   ProgressableTextButton({
@@ -58,6 +62,9 @@ class ProgressableTextButton extends StatelessWidget {
     this.disabledColor,
     this.errorColor,
     this.shadow,
+    this.enabledGradient,
+    this.disabledGradient,
+    this.errorGradient,
   }) : this.big = big ?? true;
 
   @override
@@ -84,6 +91,13 @@ class ProgressableTextButton extends StatelessWidget {
                 : Theme.of(context).textTheme.body2,
         textAlign: TextAlign.center,
       ),
+      shadow: shadow,
+      loadingBorderRadius: loadingBorderRadius,
+      errorColor: errorColor,
+      disabledColor: disabledColor,
+      disabledGradient: disabledGradient,
+      enabledGradient: enabledGradient,
+      errorGradient: errorGradient,
     );
   }
 }
@@ -109,6 +123,10 @@ class ProgressableButton extends StatefulWidget {
   final Color disabledColor;
   final Color errorColor;
 
+  final Gradient enabledGradient;
+  final Gradient disabledGradient;
+  final Gradient errorGradient;
+
   final BorderRadius idleBorderRadius;
   final BorderRadius loadingBorderRadius;
 
@@ -120,6 +138,9 @@ class ProgressableButton extends StatefulWidget {
     this.errorStream,
     this.onClick,
     this.expandedSize,
+    this.enabledGradient,
+    this.disabledGradient,
+    this.errorGradient,
     @required this.enabledChild,
     this.loadingChild,
     bool big,
@@ -134,9 +155,10 @@ class ProgressableButton extends StatefulWidget {
     EdgeInsets margin,
   })  : this.padding =
             padding ?? ProgressableButtonDefaultConfiguration.idlePadding,
-        this.loadingMargin =
-            loadingMargin ?? ProgressableButtonDefaultConfiguration.loadingMargin,
-        this.margin = margin ?? ProgressableButtonDefaultConfiguration.idleMargin,
+        this.loadingMargin = loadingMargin ??
+            ProgressableButtonDefaultConfiguration.loadingMargin,
+        this.margin =
+            margin ?? ProgressableButtonDefaultConfiguration.idleMargin,
         this.loadingBorderRadius = loadingBorderRadius ??
             ProgressableButtonDefaultConfiguration.loadingBorderRadius,
         this.idleBorderRadius = idleBorderRadius ??
@@ -145,8 +167,8 @@ class ProgressableButton extends StatefulWidget {
             enabledColor ?? ProgressableButtonDefaultConfiguration.enabledColor,
         this.errorColor =
             errorColor ?? ProgressableButtonDefaultConfiguration.errorColor,
-        this.disabledColor =
-            disabledColor ?? ProgressableButtonDefaultConfiguration.disabledColor,
+        this.disabledColor = disabledColor ??
+            ProgressableButtonDefaultConfiguration.disabledColor,
         this.shadow = shadow ?? ProgressableButtonDefaultConfiguration.shadow,
         this.big = big ?? true;
 
@@ -248,6 +270,7 @@ class _ProgressableButtonState extends State<ProgressableButton>
             duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
             decoration: BoxDecoration(
+              gradient: _backgroundGradient,
               color: _backgroundColor,
               borderRadius: _borderRadius,
               boxShadow: widget.shadow,
@@ -295,6 +318,16 @@ class _ProgressableButtonState extends State<ProgressableButton>
     if (_loading) return widget.loadingBorderRadius;
 
     return widget.idleBorderRadius;
+  }
+
+  Gradient get _backgroundGradient {
+    if (_inErrorAnimation)
+      return widget.errorGradient;
+
+    if (_loading || !_enabled)
+      return widget.disabledGradient;
+
+    return widget.enabledGradient;
   }
 
   Color get _backgroundColor {
