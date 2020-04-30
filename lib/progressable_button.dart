@@ -138,9 +138,9 @@ class ProgressableButton extends StatefulWidget {
     this.errorStream,
     this.onClick,
     this.expandedSize,
-    this.enabledGradient,
-    this.disabledGradient,
-    this.errorGradient,
+    Gradient enabledGradient,
+    Gradient disabledGradient,
+    Gradient errorGradient,
     @required this.enabledChild,
     this.loadingChild,
     bool big,
@@ -170,7 +170,46 @@ class ProgressableButton extends StatefulWidget {
         this.disabledColor = disabledColor ??
             ProgressableButtonDefaultConfiguration.disabledColor,
         this.shadow = shadow ?? ProgressableButtonDefaultConfiguration.shadow,
-        this.big = big ?? true;
+        this.big = big ?? true,
+        this.enabledGradient = enabledGradient != null ||
+                errorGradient != null ||
+                disabledGradient != null
+            ? enabledGradient ??
+                LinearGradient(
+                  colors: [
+                    enabledColor ??
+                        ProgressableButtonDefaultConfiguration.enabledColor,
+                    enabledColor ??
+                        ProgressableButtonDefaultConfiguration.enabledColor,
+                  ],
+                )
+            : enabledGradient,
+        this.disabledGradient = enabledGradient != null ||
+                errorGradient != null ||
+                disabledGradient != null
+            ? disabledGradient ??
+                LinearGradient(
+                  colors: [
+                    disabledColor ??
+                        ProgressableButtonDefaultConfiguration.disabledColor,
+                    disabledColor ??
+                        ProgressableButtonDefaultConfiguration.disabledColor,
+                  ],
+                )
+            : disabledGradient,
+        this.errorGradient = enabledGradient != null ||
+                errorGradient != null ||
+                disabledGradient != null
+            ? errorGradient ??
+                LinearGradient(
+                  colors: [
+                    errorColor ??
+                        ProgressableButtonDefaultConfiguration.errorColor,
+                    errorColor ??
+                        ProgressableButtonDefaultConfiguration.errorColor,
+                  ],
+                )
+            : errorGradient;
 
   @override
   _ProgressableButtonState createState() => _ProgressableButtonState();
@@ -321,11 +360,9 @@ class _ProgressableButtonState extends State<ProgressableButton>
   }
 
   Gradient get _backgroundGradient {
-    if (_inErrorAnimation)
-      return widget.errorGradient;
+    if (_inErrorAnimation) return widget.errorGradient;
 
-    if (_loading || !_enabled)
-      return widget.disabledGradient;
+    if (_loading || !_enabled) return widget.disabledGradient;
 
     return widget.enabledGradient;
   }

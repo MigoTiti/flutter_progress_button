@@ -13,3 +13,7 @@
 ## [1.1.0]
 
 - Possibility to add a gradient as background
+
+## [1.1.1]
+
+- Fix to force all colors as gradients in case there is a single one gradient in constructor
