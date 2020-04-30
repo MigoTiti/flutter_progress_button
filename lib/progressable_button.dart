@@ -326,11 +326,12 @@ class _ProgressableButtonState extends State<ProgressableButton>
         widget.disabledGradient != null) {
       Gradient gradient;
 
-      if (_inErrorAnimation) gradient = widget.errorGradient;
-
-      if (_loading || !_enabled) gradient = widget.disabledGradient;
-
-      gradient = widget.enabledGradient;
+      if (_inErrorAnimation)
+        gradient = widget.errorGradient;
+      else if (_loading || !_enabled)
+        gradient = widget.disabledGradient;
+      else
+        gradient = widget.enabledGradient;
 
       return gradient ??
           LinearGradient(
