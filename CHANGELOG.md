@@ -25,3 +25,7 @@
 ## [1.1.3]
 
 - Fix to force all colors as gradients in case there is a single one gradient in constructor
+
+## [1.1.4]
+
+- Initial enabled value in case the enabled stream is a rxdart's BehaviourSubject

@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:vector_math/vector_math_64.dart' as Vectors;
 import 'package:vibrate/vibrate.dart';
 
@@ -191,6 +192,10 @@ class _ProgressableButtonState extends State<ProgressableButton>
   @override
   void initState() {
     super.initState();
+
+    if (widget.enabledStream is BehaviorSubject<bool>) {
+      _enabled = (widget.enabledStream as BehaviorSubject<bool>).value;
+    }
 
     _errorAnimationController = AnimationController(
       vsync: this,

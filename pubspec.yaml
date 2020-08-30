@@ -12,6 +12,7 @@ dependencies:
 
   vibrate: ^0.0.4
   vector_math: ^2.0.8
+  rxdart:
 
 dev_dependencies:
   flutter_test:
